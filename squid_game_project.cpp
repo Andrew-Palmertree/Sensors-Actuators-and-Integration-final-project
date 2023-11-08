@@ -67,7 +67,7 @@ void loop() {
   Serial.print("Frequency is ");
   Serial.println(buzzerFreq);
 
-  // Generate a 10-microsecond pulse to trigger the ultrasonic sensor
+  // Generate a 10-microsecond pulse to  trigger the ultrasonic sensor
   digitalWrite(trigPin, HIGH);
   delayMicroseconds(10);
   digitalWrite(trigPin, LOW);
