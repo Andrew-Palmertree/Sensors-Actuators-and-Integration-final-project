@@ -1,9 +1,5 @@
 #include <Arduino.h>
 
-int greenledpin=9; //initialize pin 9
-int redledpin=11;// initialize pin 11
-
-
 // put function declarations here:
 int myFunction(int, int);
 
