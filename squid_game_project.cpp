@@ -1,5 +1,7 @@
 #include <Arduino.h>
 
+//i also hate github <33333333
+
 // put function declarations here:
 int myFunction(int, int);
 
