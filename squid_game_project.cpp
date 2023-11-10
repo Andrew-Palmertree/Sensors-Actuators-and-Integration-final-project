@@ -7,13 +7,15 @@ int potentiometer =1; //initialize analog pin 1 for potentiometer
 
 
 //digital pins///////////////////////////////////////////////////////////////////////
-int firstServo = 13; //first servor motor that has range sensor on top
-int buttonpin=18; //button that starts the game
+
 int echoPin = 2;    // ECHO pin (ultrasonic sensor)
 int trigPin = 3;    // TRIG pin (ultrasonic sensor)
 int greenledpin=4; //initialize pin 4
 int redledpin=5;// initialize pin 5
 int buzzer=6;// select digital IO pin for the buzzer
+int firstServo = 13; //first servor motor that has range sensor on top
+int secondServo =22;//2nd servor motor that sweeps field when a player loses
+int buttonpin=18; //button that starts the game
 
 ///LCD Pin set up/////////////////////////////////////////////////////////////////////////////
 const int rs = 7, en = 8, d4 = 9, d5 = 10, d6 = 11, d7 = 12; // initialize the library by associating any needed LCD interface pin
@@ -23,6 +25,11 @@ LiquidCrystal lcd(rs, en, d4, d5, d6, d7); // with the arduino pin number it is 
 int firstServoVal;// define val for 1st servo motor 
 int firstServoAngle; //define val that holds angle for 1st servo motor
 Servo myFirstServo; //defines 1st servo variable name
+
+///2nd servo variable set up////////////////////////////////////////////////////////////
+int secondServoVal;// define val for 1st servo motor 
+int secondServoAngle; //define val that holds angle for 1st servo motor
+Servo mySecondServo; //defines 1st servo variable name
 
 ///Sonic range sensor variable set up/////////////////////////////////////////////////////////////
 float duration_us, distance_cm; // get the distance for the ultrasonic sensor
@@ -49,6 +56,7 @@ void setup() {
 
     lcd.begin(16, 2); // set up the LCD's number of columns and rows:
     myFirstServo.attach(firstServo);
+    mySecondServo.attach(secondServo);
 
 
     pinMode(buttonPin, INPUT); //set button pin as input
@@ -58,7 +66,7 @@ void setup() {
 
     pinMode(trigPin, OUTPUT); // Configure the trigger pin as an output for ultrasonic sensor
     pinMode(echoPin, INPUT);  // Configure the echo pin as an input ultrasonic sensor
-    
+
   attachInterrupt(digitalPinToInterrupt(buttonpin), INT0_ISR, RISING);
 
 }
@@ -106,9 +114,12 @@ void loop() {
   Serial.print("1st Servor Angle ");
   Serial.println(firstServoAngle);
 
+///Second Servor motor part//////////////////////////////////////////////////////////////////////////
 
-
-
+  motorAngle = map(secondServoVal,0,1023,0,180);
+  myservo.write(secondServoAngle);// set rotation angle of the motor
+  Serial.print("2nd Servor Angle ");
+  Serial.println(secondServoAngle);
 
 }
 
