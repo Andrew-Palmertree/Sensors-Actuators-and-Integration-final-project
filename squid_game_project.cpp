@@ -1,4 +1,4 @@
-#include <Arduino.h>
+#include <Arduino.h> 
 #include <LiquidCrystal.h> // include the library code
 
 //analog pins
@@ -21,17 +21,17 @@ float duration_us, distance_cm; // get the distance for the ultrasonic sensor
 int myFunction(int, int);
 
 void setup() {
+
   
-  
 
-  Serial.begin(9600);// set baud rate at 9600
-  lcd.begin(16, 2); // set up the LCD's number of columns and rows:
+    Serial.begin(9600);// set baud rate at 9600
+    lcd.begin(16, 2); // set up the LCD's number of columns and rows:
 
-  pinMode(buzzer,OUTPUT);// set digital IO pin pattern, OUTPUT to be output(pin 8)
-  pinMode(greenledpin, OUTPUT);// set green LED pin as "output"
-  pinMode(redledpin,OUTPUT);// set red LED pin as “output”
+    pinMode(buzzer,OUTPUT);// set digital IO pin pattern, OUTPUT to be output(pin 8)
+    pinMode(greenledpin, OUTPUT);// set green LED pin as "output"
+    pinMode(redledpin,OUTPUT);// set red LED pin as “output”
 
-  int result = myFunction(2, 3);
+  int result = myFunction(2, 3); 
 
  // Configure the trigger pin as an output for ultrasonic sensor
   pinMode(trigPin, OUTPUT);
@@ -43,31 +43,31 @@ void setup() {
 
 void loop() {
 
-  val = analogRead(potpin); 
-  lcd.clear();
-  lcd.setCursor(0,0);
+      val = analogRead(potpin); 
+      lcd.clear();
+      lcd.setCursor(0,0);
 
-  if(val == 0){
-    lcd.print("Water Level:Dry");
-  }
-
-
-    val = analogRead(buzzerPin); // read the analog value from the sensor and assign it to val
-    buzzerFreq = map(val, 0, 1023, 60, 10000);
-    buzzerPeriod = 1e6 / buzzerFreq;
-    halfPeriod = buzzerPeriod /2;
-
-    for(int i = 0; i < 200; i++){
-      digitalWrite(buzzer, HIGH);// sound
-      delayMicroseconds(buzzerPeriod);//delay1ms
-      digitalWrite(buzzer,LOW);//not sound
-      delayMicroseconds(buzzerPeriod);//ms delay  
+    if(val == 0){
+      lcd.print("Water Level:Dry");
     }
 
-  Serial.print("Frequency is ");
-  Serial.println(buzzerFreq);
 
-  // Generate a 10-microsecond pulse to  trigger the ultrasonic sensor
+      val = analogRead(buzzerPin); // read the analog value from the sensor and assign it to val
+      buzzerFreq = map(val, 0, 1023, 60, 10000);
+      buzzerPeriod = 1e6 / buzzerFreq;
+      halfPeriod = buzzerPeriod /2;
+
+      for(int i = 0; i < 200; i++){
+        digitalWrite(buzzer, HIGH);// sound
+        delayMicroseconds(buzzerPeriod);//delay1ms
+        digitalWrite(buzzer,LOW);//not sound
+        delayMicroseconds(buzzerPeriod);//ms delay  
+      }
+
+        Serial.print("Frequency is ");
+        Serial.println(buzzerFreq);
+
+// Generate a 10-microsecond pulse to  trigger the ultrasonic sensor
   digitalWrite(trigPin, HIGH);
   delayMicroseconds(10);
   digitalWrite(trigPin, LOW);
