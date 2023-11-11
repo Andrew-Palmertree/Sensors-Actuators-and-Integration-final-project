@@ -28,6 +28,7 @@ int buzzerVal;
 const int rs = 7, en = 8, d4 = 9, d5 = 10, d6 = 11, d7 = 12; // initialize the library by associating any needed LCD interface pin
 LiquidCrystal lcd(rs, en, d4, d5, d6, d7); // with the arduino pin number it is connected to
 int potVal = 0;
+
 /// 1st servo variable set up//////////////////////////////////////////////////////////////////////
 int firstMotorAngle;
 int firstServoVal;// define val for 1st servo motor 
@@ -45,6 +46,10 @@ float duration_us, distance_cm; // get the distance for the ultrasonic sensor
 
 /// start button variable set up//////////////////////////////////////////////////////
 int buttonVal;// define val of button
+
+///game variable setup//////////////////////////////////////////////////////////////
+
+int greenLight = 0;
 
 void INT0_ISR(){ //interrupt for start of game (pin 18) button
 	
@@ -82,18 +87,15 @@ void setup() {
 
 void loop() {
 
-////LCD PART////////////////////////////////////////////////////////////////////////
-      potVal = analogRead(potentiometer); 
-      lcd.clear();
-      lcd.setCursor(0,0);
+  //*********************GREEN LIGHT**********************************************************
 
-    if(potVal == 0){
-      lcd.print("Water Level:Dry");
-    }
+  greenLight = 1;
+  digitalWrite(greenledpin,HIGH);
+  digitalWrite(redledpin,LOW);
 
-////Buzzer Part///////////////////////////////////////////////////////////////////////////////////////////////////
+  ////Buzzer Part///////////////////////////////////////////////////////////////////////////////////////////////////
 
-      
+      buzzerVal = 0;
       buzzerFreq = map(buzzerVal, 0, 1023, 60, 10000);
       buzzerPeriod = 1e6 / buzzerFreq;
 
@@ -108,6 +110,60 @@ void loop() {
         Serial.print("Frequency is ");
         Serial.println(buzzerFreq);
 
+ ////First Servo motor part ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      firstServoVal = 0;
+     // firstMotorAngle = map(firstServoVal,0,1023,0,180);
+      myFirstServo.write(firstServoVal);// set rotation angle of the motor
+      Serial.print("1st Servor Angle ");
+      Serial.println(firstServoVal); 
+
+
+  delay(2000);
+
+//*********************RED LIGHT***************************************************************************
+
+  greenLight = 0;
+
+  digitalWrite(greenledpin,LOW);
+  digitalWrite(redledpin,HIGH);
+
+  ////Buzzer Part///////////////////////////////////////////////////////////////////////////////////////////////////
+
+      buzzerVal = 1023;
+      buzzerFreq = map(buzzerVal, 0, 1023, 60, 10000);
+      buzzerPeriod = 1e6 / buzzerFreq;
+
+
+      for(int i = 0; i < 200; i++){
+        digitalWrite(buzzerPin, HIGH);// sound
+        delayMicroseconds(buzzerPeriod);//delay1ms
+        digitalWrite(buzzerPin,LOW);//not sound
+        delayMicroseconds(buzzerPeriod);//ms delay  
+      }
+
+        Serial.print("Frequency is ");
+        Serial.println(buzzerFreq);
+
+ ////First Servo motor part ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      firstServoVal = 180;
+     // firstMotorAngle = map(firstServoVal,0,1023,0,180);
+      myFirstServo.write(firstServoVal);// set rotation angle of the motor
+      Serial.print("1st Servor Angle ");
+      Serial.println(firstServoVal); 
+
+
+  delay(3000);
+
+////LCD PART////////////////////////////////////////////////////////////////////////
+      potVal = analogRead(potentiometer); 
+      lcd.clear();
+      lcd.setCursor(0,0);
+
+    if(potVal == 0){
+      lcd.print("Water Level:Dry");
+    }
+
+
 ////Ultrasonic range sensor part ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // Generate a 10-microsecond pulse to  trigger the ultrasonic sensor
@@ -116,12 +172,7 @@ void loop() {
   digitalWrite(trigPin, LOW);
   delay(500);
 
-////First Servo motor part ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-  firstMotorAngle = map(firstServoVal,0,1023,0,180);
-  myFirstServo.write(firstServoAngle);// set rotation angle of the motor
-  Serial.print("1st Servor Angle ");
-  Serial.println(firstServoAngle);
 
 ///Second Servor motor part//////////////////////////////////////////////////////////////////////////
 
