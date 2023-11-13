@@ -1,6 +1,10 @@
 #include <Arduino.h> 
 #include <LiquidCrystal.h> // include the library code
 #include <Servo.h>
+#include <Stepper.h>
+#include <Adafruit_MPU6050.h>
+#include <Adafruit_Sensor.h>
+#include <Wire.h>
 
 //analog pins///////////////////////////////////////////////////////////////////
 
@@ -51,6 +55,13 @@ int buttonVal;// define val of button
 
 int greenLight = 0;
 
+///Stepper and IMU setup
+/*
+Stepper stepper(2048, 8, 9 ,10, 11);//create stepper motor
+Adafruit_MPU6050 mpu;//createIMU
+long pi = 3.14159;
+*/
+
 void INT0_ISR(){ //interrupt for start of game (pin 18) button
 	
 
@@ -81,6 +92,31 @@ void setup() {
     pinMode(echoPin, INPUT);  // Configure the echo pin as an input ultrasonic sensor
 
   attachInterrupt(digitalPinToInterrupt(buttonpin), INT0_ISR, RISING);
+
+  /*
+  stepper.setSpeed(5);// set stepper motor speed
+
+  while (!Serial)
+    delay(10); // will pause Zero, Leonardo, etc until serial console opens
+
+  Serial.println("Adafruit MPU6050 test!");
+
+  //initalize IMU
+  if (!mpu.begin()) {
+    Serial.println("Failed to find MPU6050 chip");
+    while (1) {
+      delay(10);
+    }
+  }
+  Serial.println("MPU6050 Found!");
+
+  mpu.setAccelerometerRange(MPU6050_RANGE_2_G);// initalize mpu ranges
+  mpu.setGyroRange(MPU6050_RANGE_500_DEG);
+  mpu.setFilterBandwidth(MPU6050_BAND_21_HZ);
+
+  Serial.println("");
+  delay(100);
+  */
 
 }
 
@@ -219,5 +255,20 @@ while(1){
 
 
 }
+
+/*
+sensors_event_t a, g, temp;
+  mpu.getEvent(&a, &g, &temp);//read data from IMU
+
+  long tilt = (180/pi) * atan2(a.acceleration.x, a.acceleration.z);//calculate tilt measurement from IMU
+  Serial.println(tilt);
+
+  if(tilt > 45){//move CW when tilt > 45 deg
+    stepper.step(tilt);
+  }
+  else if(tilt < - 45){//move CCW when tilt < -45 deg
+    stepper.step(tilt);
+  }
+*/
 
 }
