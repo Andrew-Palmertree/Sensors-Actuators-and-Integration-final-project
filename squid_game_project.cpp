@@ -42,7 +42,7 @@ int secondServoAngle; //define val that holds angle for 1st servo motor
 Servo mySecondServo; //defines 1st servo variable name
 
 ///Sonic range sensor variable set up/////////////////////////////////////////////////////////////
-float duration_us, distance_cm; // get the distance for the ultrasonic sensor
+float duration, distance_cm, distance_inch;// distance for the ultrasonic sensor
 
 /// start button variable set up//////////////////////////////////////////////////////
 int buttonVal;// define val of button
@@ -58,7 +58,6 @@ void INT0_ISR(){ //interrupt for start of game (pin 18) button
 
 void INT1_ISR(){// interrupt game clock countdown (pin 19)  button
 	
-
 
 }
 
@@ -85,100 +84,140 @@ void setup() {
 
 }
 
+void LEDs(int LED_switch){
+
+  if (LED_switch == 1){
+    digitalWrite(greenledpin, LOW);
+    digitalWrite(redledpin, HIGH);
+  } else{
+    digitalWrite(redledpin, LOW);
+    digitalWrite(greenledpin, HIGH);
+  }
+
+}
+
+void buzzer_noise(int noiseMode){
+
+    if(noiseMode == 1){
+
+    
+      for(int i = 0; i < 2000; i++){
+        digitalWrite(buzzerPin, HIGH);// sound
+        delayMicroseconds(1e6 / 60);//delay1ms
+        digitalWrite(buzzerPin,LOW);//not sound
+        delayMicroseconds(1e6 / 60);//ms delay  
+      }
+
+    }
+     else{
+
+      for(int i = 0; i < 2000; i++){
+        digitalWrite(buzzerPin, HIGH);// sound
+        delayMicroseconds(1e6 / 10000);//delay1ms
+        digitalWrite(buzzerPin,LOW);//not sound
+        delayMicroseconds(1e6 / 10000);//ms delay  
+      }
+
+    }
+  
+}
+
+void Ultrasonic() {
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(5);
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
+
+  duration = pulseIn(echoPin, HIGH);
+
+  distance_cm = (duration * 2) / 29.1;
+  Serial.print("Distance: ");
+  Serial.print(distance_cm);
+  Serial.println(" cm");
+}
+
+void LCD_screen(){
+
+  // Display the time left on the LCD
+  // if (timeLeft >= 0){
+  //   lcd.setCursor(0, 0);
+  //   lcd.print("Time Left");
+  //   lcd.setCursor(0, 1);
+  //   lcd.print(timeLeft);
+  //   lcd.print(" Seconds");
+  // }
+
+  // if (timeLeft <= -1){
+  //   lcd.setCursor(0, 0);
+  //   lcd.print("      Game      ");
+  //   lcd.setCursor(0, 1);
+  //   lcd.print("      Over      ");
+  //   game_active = 0;
+  // }
+}
+
+
+
+
+
+void servo1(int servoMode) {
+
+
+  int currentAngle = myFirstServo.read(); // myservo1.read(); 
+
+   myFirstServo.write(servoMode);
+  
+     Serial.print("Servo1 Angle ");
+     Serial.println(currentAngle);
+
+
+}
+
+void servo2(int winMode) {
+
+
+  int currentAngle = mySecondServo.read(); // myservo1.read(); 
+
+   mySecondServo.write(winMode);
+  
+    // Serial.print("Servo2 Angle ");
+    // Serial.println(currentAngle);
+
+
+}
+
+
+
 void loop() {
 
   //*********************GREEN LIGHT**********************************************************
-
+while(1){
   greenLight = 1;
-  digitalWrite(greenledpin,HIGH);
-  digitalWrite(redledpin,LOW);
 
-  ////Buzzer Part///////////////////////////////////////////////////////////////////////////////////////////////////
-
-      buzzerVal = 0;
-      buzzerFreq = map(buzzerVal, 0, 1023, 60, 10000);
-      buzzerPeriod = 1e6 / buzzerFreq;
-
-
-      for(int i = 0; i < 200; i++){
-        digitalWrite(buzzerPin, HIGH);// sound
-        delayMicroseconds(buzzerPeriod);//delay1ms
-        digitalWrite(buzzerPin,LOW);//not sound
-        delayMicroseconds(buzzerPeriod);//ms delay  
-      }
-
-        Serial.print("Frequency is ");
-        Serial.println(buzzerFreq);
-
- ////First Servo motor part ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-      firstServoVal = 0;
-     // firstMotorAngle = map(firstServoVal,0,1023,0,180);
-      myFirstServo.write(firstServoVal);// set rotation angle of the motor
-      Serial.print("1st Servor Angle ");
-      Serial.println(firstServoVal); 
+    LEDs(greenLight);
+    servo1(0);
+    buzzer_noise(greenLight);
+    //Ultrasonic();  
+    
+   
 
 
-  delay(2000);
+   delay(2000);
 
 //*********************RED LIGHT***************************************************************************
 
   greenLight = 0;
 
-  digitalWrite(greenledpin,LOW);
-  digitalWrite(redledpin,HIGH);
-
-  ////Buzzer Part///////////////////////////////////////////////////////////////////////////////////////////////////
-
-      buzzerVal = 1023;
-      buzzerFreq = map(buzzerVal, 0, 1023, 60, 10000);
-      buzzerPeriod = 1e6 / buzzerFreq;
-
-
-      for(int i = 0; i < 200; i++){
-        digitalWrite(buzzerPin, HIGH);// sound
-        delayMicroseconds(buzzerPeriod);//delay1ms
-        digitalWrite(buzzerPin,LOW);//not sound
-        delayMicroseconds(buzzerPeriod);//ms delay  
-      }
-
-        Serial.print("Frequency is ");
-        Serial.println(buzzerFreq);
-
- ////First Servo motor part ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-      firstServoVal = 180;
-     // firstMotorAngle = map(firstServoVal,0,1023,0,180);
-      myFirstServo.write(firstServoVal);// set rotation angle of the motor
-      Serial.print("1st Servor Angle ");
-      Serial.println(firstServoVal); 
+  
+    LEDs(greenLight);
+    servo1(180);
+    buzzer_noise(greenLight);   
+   // Ultrasonic();
+     
+    delay(3000);
 
 
-  delay(3000);
-
-////LCD PART////////////////////////////////////////////////////////////////////////
-      potVal = analogRead(potentiometer); 
-      lcd.clear();
-      lcd.setCursor(0,0);
-
-    if(potVal == 0){
-      lcd.print("Water Level:Dry");
-    }
-
-
-////Ultrasonic range sensor part ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-// Generate a 10-microsecond pulse to  trigger the ultrasonic sensor
-  digitalWrite(trigPin, HIGH);
-  delayMicroseconds(10);
-  digitalWrite(trigPin, LOW);
-  delay(500);
-
-
-
-///Second Servor motor part//////////////////////////////////////////////////////////////////////////
-
-  secondMotorAngle = map(secondServoVal,0,1023,0,180);
-  mySecondServo.write(secondServoAngle);// set rotation angle of the motor
-  Serial.print("2nd Servor Angle ");
-  Serial.println(secondServoAngle);
+}
 
 }
