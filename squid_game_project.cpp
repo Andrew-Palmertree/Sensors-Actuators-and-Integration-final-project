@@ -74,6 +74,21 @@ void INT1_ISR(){// interrupt game clock countdown (pin 19)  button
 
 void setup() {
 
+  cli();
+
+  TCCR2A = 0;
+  TCCR2B = 0;
+  TCNT2 = 0;
+
+  OCR1A = 15624 /1;  
+
+  TCCR2B |= (1 << WGM21);
+  TCCR2B |= (1 << CS22)  | (1 << CS20);
+  TIMSK2 |= (1 << OCIE2A);
+
+  sei();
+
+
   
 
     Serial.begin(9600);// set baud rate at 9600
@@ -119,7 +134,54 @@ void setup() {
   */
 
 }
+int greenLight = 0;
+int gameStart = 0;
+int gameTime = 0;
 
+
+volatile int toggleServo = 0;
+volatile int servoTime = 0;
+volatile int servoState = 0;
+
+void INT0_ISR(){ //interrupt for start of game (pin 18) button
+
+  gameStart = 1;
+	
+
+}
+
+
+
+ISR(TIMER2_COMPA_vect){// interrupt game clock countdown (pin 19)  button
+
+  gameTime ++;
+
+  servoTime++;
+
+
+  if(servoState==0){
+
+      if(servoTime ==3){
+
+        toggleServo = 1;
+        servoState = 180;// angle
+        servoTime = 0;
+
+      }
+  }
+  else{
+
+      if (servoTime == 2){
+
+         toggleServo = 1;
+        servoState = 0; //angle
+        servoTime = 0;
+
+      }
+  }
+
+
+}
 void LEDs(int LED_switch){
 
   if (LED_switch == 1){
@@ -228,31 +290,29 @@ void servo2(int winMode) {
 
 void loop() {
 
-  //*********************GREEN LIGHT**********************************************************
-while(1){
-  greenLight = 1;
+
+  if(toggleServo == 1){
+
+    Serial.print("works");
+
+     greenLight = 1;
 
     LEDs(greenLight);
-    servo1(0);
+    servo1(servoState);
     buzzer_noise(greenLight);
-    Ultrasonic();  
+
+    toggleServo = 0;
     
-   
+  }
+  else{
+
+     greenLight = 0;
 
 
-   delay(2000);
+    //Ultrasonic();
+    buzzer_noise(greenLight);  
 
-//*********************RED LIGHT***************************************************************************
-
-  greenLight = 0;
-
-  
-    LEDs(greenLight);
-    servo1(180);
-    buzzer_noise(greenLight);   
-    Ultrasonic();
-     
-    delay(3000);
+    //toggleServo = 1;
 
 
 }
