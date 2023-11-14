@@ -123,6 +123,7 @@ void buzzer_noise(int noiseMode){
 }
 
 void Ultrasonic() {
+  Serial.print("pls work ");
   digitalWrite(trigPin, LOW);
   delayMicroseconds(5);
   digitalWrite(trigPin, HIGH);
@@ -198,7 +199,7 @@ while(1){
     LEDs(greenLight);
     servo1(0);
     buzzer_noise(greenLight);
-    //Ultrasonic();  
+    Ultrasonic();  
     
    
 
@@ -213,7 +214,7 @@ while(1){
     LEDs(greenLight);
     servo1(180);
     buzzer_noise(greenLight);   
-   // Ultrasonic();
+    Ultrasonic();
      
     delay(3000);
 
