@@ -1,10 +1,11 @@
-#include <Arduino.h> 
-#include <LiquidCrystal.h> // include the library code
-#include <Servo.h>
 #include <Stepper.h>
 #include <Adafruit_MPU6050.h>
 #include <Adafruit_Sensor.h>
 #include <Wire.h>
+
+#include <Arduino.h> 
+#include <LiquidCrystal.h> // include the library code
+#include <Servo.h>
 
 //analog pins///////////////////////////////////////////////////////////////////
 
@@ -17,7 +18,7 @@ int echoPin = 2;    // ECHO pin (ultrasonic sensor)
 int trigPin = 3;    // TRIG pin (ultrasonic sensor)
 int greenledpin=4; //initialize pin 4
 int redledpin=5;// initialize pin 5
-int buzzerPin=6;// select digital IO pin for the buzzer
+int buzzerPin=6;// select digital IO pin for the buzzer //9 or 10
 int firstServo = 13; //first servor motor that has range sensor on top
 int secondServo =22;//2nd servor motor that sweeps field when a player loses
 int buttonpin=18; //button that starts the game
@@ -54,37 +55,37 @@ int buttonVal;// define val of button
 ///game variable setup//////////////////////////////////////////////////////////////
 
 int greenLight = 0;
+int gameStart = 0;
+int gameTime = 60;
 
-///Stepper and IMU setup
-/*
-Stepper stepper(2048, 8, 9 ,10, 11);//create stepper motor
-Adafruit_MPU6050 mpu;//createIMU
-long pi = 3.14159;
-*/
+
+volatile int toggleServo = 0;
+volatile int servoTime = 0;
+volatile int servoState = 0;
+
 
 void INT0_ISR(){ //interrupt for start of game (pin 18) button
+
+  gameStart = 1;
 	
 
 }
 
-void INT1_ISR(){// interrupt game clock countdown (pin 19)  button
-	
 
-}
 
 void setup() {
 
   cli();
 
-  TCCR2A = 0;
-  TCCR2B = 0;
-  TCNT2 = 0;
+  TCCR1A = 0;
+  TCCR1B = 0;
+  TCNT1 = 0;
 
   OCR1A = 15624 /1;  
 
-  TCCR2B |= (1 << WGM21);
-  TCCR2B |= (1 << CS22)  | (1 << CS20);
-  TIMSK2 |= (1 << OCIE2A);
+  TCCR1B |= (1 << WGM12);
+  TCCR1B |= (1 << CS12) | (0 << CS11)  | (1 << CS10);
+  TIMSK1 |= (1 << OCIE1A);
 
   sei();
 
@@ -97,6 +98,8 @@ void setup() {
     myFirstServo.attach(firstServo);
     mySecondServo.attach(secondServo);
 
+    pinMode(buttonpin, INPUT); // Set the button pin as an input
+
 
     
     pinMode(buzzerPin,OUTPUT);// set digital IO pin pattern, OUTPUT to be output(pin 8)
@@ -108,80 +111,12 @@ void setup() {
 
   attachInterrupt(digitalPinToInterrupt(buttonpin), INT0_ISR, RISING);
 
-  /*
-  stepper.setSpeed(5);// set stepper motor speed
-
-  while (!Serial)
-    delay(10); // will pause Zero, Leonardo, etc until serial console opens
-
-  Serial.println("Adafruit MPU6050 test!");
-
-  //initalize IMU
-  if (!mpu.begin()) {
-    Serial.println("Failed to find MPU6050 chip");
-    while (1) {
-      delay(10);
-    }
-  }
-  Serial.println("MPU6050 Found!");
-
-  mpu.setAccelerometerRange(MPU6050_RANGE_2_G);// initalize mpu ranges
-  mpu.setGyroRange(MPU6050_RANGE_500_DEG);
-  mpu.setFilterBandwidth(MPU6050_BAND_21_HZ);
-
-  Serial.println("");
-  delay(100);
-  */
-
-}
-int greenLight = 0;
-int gameStart = 0;
-int gameTime = 0;
-
-
-volatile int toggleServo = 0;
-volatile int servoTime = 0;
-volatile int servoState = 0;
-
-void INT0_ISR(){ //interrupt for start of game (pin 18) button
-
-  gameStart = 1;
-	
-
 }
 
 
 
-ISR(TIMER2_COMPA_vect){// interrupt game clock countdown (pin 19)  button
-
-  gameTime ++;
-
-  servoTime++;
 
 
-  if(servoState==0){
-
-      if(servoTime ==3){
-
-        toggleServo = 1;
-        servoState = 180;// angle
-        servoTime = 0;
-
-      }
-  }
-  else{
-
-      if (servoTime == 2){
-
-         toggleServo = 1;
-        servoState = 0; //angle
-        servoTime = 0;
-
-      }
-  }
-
-
-}
 void LEDs(int LED_switch){
 
   if (LED_switch == 1){
@@ -196,32 +131,27 @@ void LEDs(int LED_switch){
 
 void buzzer_noise(int noiseMode){
 
+
+
     if(noiseMode == 1){
 
+      tone(buzzerPin, 2000);
     
-      for(int i = 0; i < 2000; i++){
-        digitalWrite(buzzerPin, HIGH);// sound
-        delayMicroseconds(1e6 / 60);//delay1ms
-        digitalWrite(buzzerPin,LOW);//not sound
-        delayMicroseconds(1e6 / 60);//ms delay  
-      }
+    
 
     }
      else{
 
-      for(int i = 0; i < 2000; i++){
-        digitalWrite(buzzerPin, HIGH);// sound
-        delayMicroseconds(1e6 / 10000);//delay1ms
-        digitalWrite(buzzerPin,LOW);//not sound
-        delayMicroseconds(1e6 / 10000);//ms delay  
-      }
+      tone(buzzerPin, 4000);
 
     }
   
 }
 
 void Ultrasonic() {
-  Serial.print("pls work ");
+
+if(greenLight = 0){
+
   digitalWrite(trigPin, LOW);
   delayMicroseconds(5);
   digitalWrite(trigPin, HIGH);
@@ -230,10 +160,11 @@ void Ultrasonic() {
 
   duration = pulseIn(echoPin, HIGH);
 
-  distance_cm = (duration * 2) / 29.1;
+  distance_cm = (duration) / 58.2;
   Serial.print("Distance: ");
   Serial.print(distance_cm);
   Serial.println(" cm");
+}
 }
 
 void LCD_screen(){
@@ -257,22 +188,19 @@ void LCD_screen(){
 }
 
 
-
-
-
 void servo1(int servoMode) {
 
 
   int currentAngle = myFirstServo.read(); // myservo1.read(); 
 
-   myFirstServo.write(servoMode);
+    myFirstServo.write(servoMode);
   
      Serial.print("Servo1 Angle ");
      Serial.println(currentAngle);
 
 
 }
-
+/*
 void servo2(int winMode) {
 
 
@@ -285,34 +213,71 @@ void servo2(int winMode) {
 
 
 }
+*/
+
+ISR(TIMER1_COMPA_vect){// interrupt game clock countdown (pin 19)  button
+
+ 
+
+  if(gameTime == 0){
+    gameTime = 0;
+  }
+  else{
+     gameTime --;
+  }
+
+  servoTime++;
+
+
+  if(servoState==0){ //redlight phase where ultrasonic sensor faces player
+
+     //Ultrasonic();
+
+      if(servoTime ==3){
+        greenLight = 0;
+        //toggleServo = 1;
+        servoState = 180;// angle after 3 sec go back to greenlight
+
+
+        servoTime = 0;
+
+      }
+  }
+  else{//greenlight phase where is turned away from sensor
+
+     
+
+      if (servoTime == 2){
+           greenLight = 1;
+        // toggleServo = 1;
+
+
+
+        servoState = 0; //angle after 2 sec go back to redlight
+        servoTime = 0;
+
+      }
+  }
+
+
+}
 
 
 
 void loop() {
 
-
-  if(toggleServo == 1){
-
-    Serial.print("works");
-
-     greenLight = 1;
-
     LEDs(greenLight);
     servo1(servoState);
     buzzer_noise(greenLight);
 
-    toggleServo = 0;
-    
-  }
-  else{
 
-     greenLight = 0;
+Serial.println(servoTime);
 
 
-    //Ultrasonic();
-    buzzer_noise(greenLight);  
 
-    //toggleServo = 1;
+
+
+  
 
 
 }
