@@ -120,11 +120,11 @@ void setup() {
 void LEDs(int LED_switch){
 
   if (LED_switch == 1){
+    digitalWrite(greenledpin, HIGH);
+    digitalWrite(redledpin, LOW);
+  } else{
     digitalWrite(greenledpin, LOW);
     digitalWrite(redledpin, HIGH);
-  } else{
-    digitalWrite(redledpin, LOW);
-    digitalWrite(greenledpin, HIGH);
   }
 
 }
@@ -150,7 +150,7 @@ void buzzer_noise(int noiseMode){
 
 void Ultrasonic() {
 
-if(greenLight = 0){
+//if(greenLight = 0){
 
   digitalWrite(trigPin, LOW);
   delayMicroseconds(5);
@@ -164,7 +164,7 @@ if(greenLight = 0){
   Serial.print("Distance: ");
   Serial.print(distance_cm);
   Serial.println(" cm");
-}
+//}
 }
 
 void LCD_screen(){
@@ -195,8 +195,8 @@ void servo1(int servoMode) {
 
     myFirstServo.write(servoMode);
   
-     Serial.print("Servo1 Angle ");
-     Serial.println(currentAngle);
+    // Serial.print("Servo1 Angle ");
+     //Serial.println(currentAngle);
 
 
 }
@@ -234,7 +234,7 @@ ISR(TIMER1_COMPA_vect){// interrupt game clock countdown (pin 19)  button
      //Ultrasonic();
 
       if(servoTime ==3){
-        greenLight = 0;
+        greenLight = 1;
         //toggleServo = 1;
         servoState = 180;// angle after 3 sec go back to greenlight
 
@@ -248,7 +248,7 @@ ISR(TIMER1_COMPA_vect){// interrupt game clock countdown (pin 19)  button
      
 
       if (servoTime == 2){
-           greenLight = 1;
+           greenLight = 0;
         // toggleServo = 1;
 
 
@@ -266,21 +266,24 @@ ISR(TIMER1_COMPA_vect){// interrupt game clock countdown (pin 19)  button
 
 void loop() {
 
+  
+
     LEDs(greenLight);
     servo1(servoState);
     buzzer_noise(greenLight);
 
+  if(greenLight == 0){
+    
+  Ultrasonic();
+}
 
-Serial.println(servoTime);
+//Serial.println(servoTime);
 
-
-
-
-
-  
 
 
 }
+
+
 
 /*
 sensors_event_t a, g, temp;
@@ -297,4 +300,3 @@ sensors_event_t a, g, temp;
   }
 */
 
-}
