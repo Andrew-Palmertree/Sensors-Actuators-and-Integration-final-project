@@ -277,6 +277,8 @@ void loop() {
 
  if(gameStart == 1){ 
 
+  gameTime = 60;
+
     LEDs(greenLight);
     servo1(servoState);
     buzzer_noise(greenLight);
