@@ -56,7 +56,7 @@ int buttonVal;// define val of button
 
 int greenLight = 0;
 int gameStart = 0;
-int gameTime = 60;
+volatile int timeLeft = 60;
 
 
 volatile int toggleServo = 0;
@@ -125,6 +125,8 @@ void LEDs(int LED_switch){
   } else{
     digitalWrite(redledpin, HIGH);
     digitalWrite(greenledpin, LOW);
+
+    
   }
 
 }
@@ -161,16 +163,20 @@ void Ultrasonic() {
 
   distance_cm = (duration) / 58.2;
 
-  if(distance_cm > (prevDistance + 10) || distance_cm < (prevDistance -10 )){
-    gameStart = 0;
-  }
-
 
   Serial.print("Distance: ");
   Serial.print(distance_cm);
   Serial.println(" cm");
 
-  prevDistance = distance_cm;
+  delay(500); 
+
+  
+  if(distance_cm > (prevDistance + 10) || distance_cm < (prevDistance -10 )){
+    gameStart = 0;
+  }
+
+
+  //prevDistance = distance_cm;
 
   
 
@@ -228,11 +234,11 @@ ISR(TIMER1_COMPA_vect){// interrupt game clock countdown (pin 19)  button
 
  
 
-  if(gameTime == 0){
-    gameTime = 0;
+  if(timeLeft == 0){
+    timeLeft = 0;
   }
   else{
-     gameTime --;
+     timeLeft --;
   }
 
   servoTime++;
@@ -248,6 +254,8 @@ ISR(TIMER1_COMPA_vect){// interrupt game clock countdown (pin 19)  button
 
 
         servoTime = 0;
+
+        //while(1);
 
       }
   }
@@ -277,14 +285,16 @@ void loop() {
 
  if(gameStart == 1){ 
 
-  gameTime = 60;
+    timeLeft = 60;
 
-    LEDs(greenLight);
     servo1(servoState);
+    LEDs(greenLight);
     buzzer_noise(greenLight);
 
   if(greenLight == 0){
-    
+
+
+  delay(200);  
   Ultrasonic();
 }
  
