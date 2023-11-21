@@ -48,7 +48,7 @@ Servo myFirstServo; //defines 1st servo variable name
 int secondMotorAngle;
 int secondServoVal;// define val for 1st servo motor 
 int secondServoAngle; //define val that holds angle for 1st servo motor
-Servo mySecondServo; //defines 1st servo variable name
+Servo mySecondServo; //defines 2nd servo variable name
 
 ///Sonic range sensor variable set up/////////////////////////////////////////////////////////////
 float duration, distance_cm, distance_inch;// distance for the ultrasonic sensor
@@ -60,6 +60,7 @@ int buttonVal;// define val of button
 
 int greenLight = 0;
 int gameStart = 0;
+int loseMode = 0;
 volatile int timeLeft = 60;
 
 
@@ -71,6 +72,8 @@ volatile int servoState = 0;
 void INT0_ISR(){ //interrupt for start of game (pin 18) button
 
   gameStart = 1;
+  loseMode = 0;
+
 	
 
 }
@@ -93,7 +96,7 @@ void setup() {
 
   sei();
 
-
+  //mySecondServo.write(0);
   
 
     Serial.begin(9600);// set baud rate at 9600
@@ -181,7 +184,7 @@ void Ultrasonic() {
 
     if(distance_cm > (prevDistance + 10) || distance_cm < (prevDistance -10 )){
     
-      gameStart = 0;
+      loseMode  = 1;
     }
   }
 
@@ -228,20 +231,22 @@ void servo1(int servoMode) {
 
 
 }
-/*
+
 void servo2(int winMode) {
 
 
-  int currentAngle = mySecondServo.read(); // myservo1.read(); 
+  //int currentAngle = mySecondServo.read(); // myservo1.read(); 
 
    mySecondServo.write(winMode);
+   Serial.print("2ND ANGLE: ");
+   Serial.println(mySecondServo.read());
   
     // Serial.print("Servo2 Angle ");
     // Serial.println(currentAngle);
 
 
 }
-*/
+
 
 ISR(TIMER1_COMPA_vect){// interrupt game clock countdown (pin 19)  button
 
@@ -294,32 +299,49 @@ void loop() {
 
   // Serial.print("GAME START: ");
   //Serial.println(gameStart);
+  
+  //Serial.print("2ND SERVO: ");
+ // Serial.println(mySecondServo.read());
 
- if(gameStart == 1){ 
+  if (gameStart == 1){
 
-    timeLeft = 60;
-
-    servo1(servoState);
-    LEDs(greenLight);
-    buzzer_noise(greenLight);
-
-  if(greenLight == 0){
+      if(loseMode== 0){ 
 
 
-  //delay(200);  
-  Ultrasonic();
-}
+        servo2(0);
+        timeLeft = 60;
+
+        servo1(servoState);
+        LEDs(greenLight);
+        buzzer_noise(greenLight);
+
+        if(greenLight == 0){
+
+
+        //delay(200);  
+        Ultrasonic();
+        }
  
 //Serial.println(servoTime);
- }
+      }
+    else{
+
+    servo2(180);
+    digitalWrite(redledpin, LOW);
+    digitalWrite(greenledpin, LOW);
+    digitalWrite(buzzerPin, LOW); // Turn the buzzer off
+  
+  }
+  }
  else{
 
+  servo2(0);
   digitalWrite(redledpin, LOW);
   digitalWrite(greenledpin, LOW);
   digitalWrite(buzzerPin, LOW); // Turn the buzzer off
-  
- }
 
+ 
+}
 
 }
 
