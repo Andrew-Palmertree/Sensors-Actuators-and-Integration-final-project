@@ -7,6 +7,10 @@
 #include <LiquidCrystal.h> // include the library code
 #include <Servo.h>
 
+#include <Arduino.h> 
+#include <LiquidCrystal.h> // include the library code
+#include <Servo.h>
+
 //analog pins///////////////////////////////////////////////////////////////////
 
 int potentiometer =0; //initialize analog pin 1 for potentiometer
@@ -168,15 +172,21 @@ void Ultrasonic() {
   Serial.print(distance_cm);
   Serial.println(" cm");
 
-  delay(500); 
+  Serial.print("Sensing Angle: ");
+  Serial.println(myFirstServo.read());
 
-  
-  if(distance_cm > (prevDistance + 10) || distance_cm < (prevDistance -10 )){
-    gameStart = 0;
+  if(myFirstServo.read() == 0){
+
+    delay(300); 
+
+    if(distance_cm > (prevDistance + 10) || distance_cm < (prevDistance -10 )){
+    
+      gameStart = 0;
+    }
   }
 
 
-  //prevDistance = distance_cm;
+  prevDistance = distance_cm;
 
   
 
@@ -193,7 +203,7 @@ void LCD_screen(){
   //   lcd.print(" Seconds");
   // }
 
-  // if (timeLeft <= -1){
+  // if (timeLeft == 0){
   //   lcd.setCursor(0, 0);
   //   lcd.print("      Game      ");
   //   lcd.setCursor(0, 1);
@@ -206,11 +216,14 @@ void LCD_screen(){
 void servo1(int servoMode) {
 
 
-  int currentAngle = myFirstServo.read(); // myservo1.read(); 
+  int currentAngle = myFirstServo.read(); // myservo1.read();
+
+  Serial.print("Current Angle: ");
+  Serial.println(currentAngle); 
 
     myFirstServo.write(servoMode);
   
-    // Serial.print("Servo1 Angle ");
+     //Serial.print("Servo1 Angle ");
      //Serial.println(currentAngle);
 
 
@@ -255,7 +268,6 @@ ISR(TIMER1_COMPA_vect){// interrupt game clock countdown (pin 19)  button
 
         servoTime = 0;
 
-        //while(1);
 
       }
   }
@@ -280,8 +292,8 @@ ISR(TIMER1_COMPA_vect){// interrupt game clock countdown (pin 19)  button
 
 void loop() {
 
-   Serial.print("GAME START: ");
-  Serial.println(gameStart);
+  // Serial.print("GAME START: ");
+  //Serial.println(gameStart);
 
  if(gameStart == 1){ 
 
@@ -294,7 +306,7 @@ void loop() {
   if(greenLight == 0){
 
 
-  delay(200);  
+  //delay(200);  
   Ultrasonic();
 }
  
