@@ -351,7 +351,7 @@ void loop() {
   
   digitalWrite(redledpin, LOW);
   digitalWrite(greenledpin, LOW);
-  digitalWrite(buzzerPin, LOW); // Turn the buzzer off
+  noTone(buzzerPin); // Turn the buzzer off
 
  
 }
