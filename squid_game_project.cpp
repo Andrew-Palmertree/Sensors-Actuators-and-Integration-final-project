@@ -66,6 +66,10 @@ volatile int servoState = 0;
 
 void INT0_ISR(){ //interrupt for start of game (pin 18) button
 
+
+  if(loseMode = 1){
+    timeLeft = 60;
+  }
   gameStart = 1;
   loseMode = 0;
 
