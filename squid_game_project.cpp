@@ -2,11 +2,6 @@
 #include <Adafruit_MPU6050.h>
 #include <Adafruit_Sensor.h>
 #include <Wire.h>
-
-#include <Arduino.h> 
-#include <LiquidCrystal.h> // include the library code
-#include <Servo.h>
-
 #include <Arduino.h> 
 #include <LiquidCrystal.h> // include the library code
 #include <Servo.h>
@@ -203,24 +198,24 @@ void Ultrasonic() {
 
 }
 
-void LCD_screen(){
+void LCD_screen(){// Display the time left on the LCD
 
-  // Display the time left on the LCD
-  // if (timeLeft >= 0){
-  //   lcd.setCursor(0, 0);
-  //   lcd.print("Time Left");
-  //   lcd.setCursor(0, 1);
-  //   lcd.print(timeLeft);
-  //   lcd.print(" Seconds");
-  // }
+  
+  if (timeLeft >= 0){
+    lcd.setCursor(0, 0);
+    lcd.print("Time Left");
+    lcd.setCursor(0, 1);
+    lcd.print(timeLeft);
+    lcd.print(" Seconds");
+  }
 
-  // if (timeLeft == 0){
-  //   lcd.setCursor(0, 0);
-  //   lcd.print("      Game      ");
-  //   lcd.setCursor(0, 1);
-  //   lcd.print("      Over      ");
-  //   game_active = 0;
-  // }
+  if (timeLeft == 0){
+    lcd.setCursor(0, 0);
+    lcd.print("      Game      ");
+    lcd.setCursor(0, 1);
+    lcd.print("      Over      ");
+    loseMode = 1;
+  }
 }
 
 
@@ -240,12 +235,17 @@ void servo1(int servoMode) {
 
 }
 
-void servo2(int winMode) {
+void servo2(int loseMode) {
 
 
   //int currentAngle = mySecondServo.read(); // myservo1.read(); 
 
-   mySecondServo.write(winMode);
+  if(loseMode == 0){
+   mySecondServo.write(0);
+  }
+  else{
+    mySecondServo.write(180);
+  }
    //Serial.print("2ND ANGLE: ");
    //Serial.println(mySecondServo.read());
   
@@ -313,6 +313,10 @@ void loop() {
 
   if (gameStart == 1){
 
+    servo2(loseMode);
+
+    LCD_screen();
+
       if(loseMode== 0){ 
 
 
@@ -333,8 +337,8 @@ void loop() {
 //Serial.println(servoTime);
       }
     else{
-
-   // servo2(180);
+   
+    
     digitalWrite(redledpin, LOW);
     digitalWrite(greenledpin, LOW);
     digitalWrite(buzzerPin, LOW); // Turn the buzzer off
@@ -344,7 +348,7 @@ void loop() {
  else{
 
   
-  servo2(0);
+  
   digitalWrite(redledpin, LOW);
   digitalWrite(greenledpin, LOW);
   digitalWrite(buzzerPin, LOW); // Turn the buzzer off
@@ -353,7 +357,6 @@ void loop() {
 }
 
 }
-
 /*
 sensors_event_t a, g, temp;
   mpu.getEvent(&a, &g, &temp);//read data from IMU
