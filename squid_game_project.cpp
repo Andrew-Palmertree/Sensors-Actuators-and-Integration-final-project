@@ -201,21 +201,20 @@ void Ultrasonic() {
 void LCD_screen(){// Display the time left on the LCD
 
   
-  if (timeLeft >= 0){
-    lcd.setCursor(0, 0);
-    lcd.print("Time Left");
-    lcd.setCursor(0, 1);
-    lcd.print(timeLeft);
-    lcd.print(" Seconds");
-  }
-
-  if (timeLeft == 0){
+  if (timeLeft == 0 || loseMode == 1){
     lcd.setCursor(0, 0);
     lcd.print("      Game      ");
     lcd.setCursor(0, 1);
     lcd.print("      Over      ");
-    loseMode = 1;
   }
+
+   else if (timeLeft >= 0){
+     lcd.setCursor(0, 0);
+     lcd.print("Time Left");
+     lcd.setCursor(0, 1);
+     lcd.print(timeLeft);
+     lcd.print(" Seconds      ");
+   }
 }
 
 
@@ -262,6 +261,7 @@ ISR(TIMER1_COMPA_vect){// interrupt game clock countdown (pin 19)  button
 
   if(timeLeft == 0){
     timeLeft = 0;
+    loseMode = 1;
   }
   else{
      timeLeft --;
@@ -321,7 +321,7 @@ void loop() {
 
 
        // servo2(0);
-        timeLeft = 60;
+        //timeLeft = 60;
 
         servo1(servoState);
         LEDs(greenLight);
