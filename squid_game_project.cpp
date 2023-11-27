@@ -53,7 +53,7 @@ int buttonVal;// define val of button
 
 ///game variable setup//////////////////////////////////////////////////////////////
 
-int greenLight = 1;
+int greenLight = 0;
 int gameStart = 0;
 int loseMode = 0;
 volatile int timeLeft = 60;
@@ -62,17 +62,21 @@ volatile int timeLeft = 60;
 volatile int toggleServo = 0;
 volatile int servoTime = 0;
 volatile int servoState = 0;
+int ultrasonicFirstReading = 1;
 
+
+//testing
+int counter=0;
 
 void INT0_ISR(){ //interrupt for start of game (pin 18) button
 
-
-  if(loseMode = 1){
-    timeLeft = 60;
-  }
+  timeLeft = 60;
   gameStart = 1;
   loseMode = 0;
-
+  servoState = 0;
+  greenLight = 0;
+  servoTime = 0;
+  int ultrasonicFirstReading = 1;
 	
 
 }
@@ -178,21 +182,26 @@ void Ultrasonic() {
   //Serial.println(myFirstServo.read());
 
   if(myFirstServo.read() == 0){
+    if (ultrasonicFirstReading == 1){
+      ultrasonicFirstReading = 0;
+      prevDistance = distance_cm;
+    }
+    else{
 
    // delay(300); 
 
     
 
-    if(distance_cm > (prevDistance + 10) || distance_cm < (prevDistance -10 )){
-    
-      loseMode  = 1;
+      if(distance_cm > (prevDistance + 10) || distance_cm < (prevDistance -10 )){
+        Serial.println("You lost!");
+        // loseMode  = 1;
+      }
+
+      prevDistance = distance_cm;
+
+      Serial.print("PREVIOUS Distance: ");
+      Serial.println(prevDistance);
     }
-
-    prevDistance = distance_cm;
-
-     Serial.print("PREVIOUS Distance: ");
-    Serial.println(prevDistance);
-     
   }
 
 
@@ -260,8 +269,14 @@ void servo2(int loseMode) {
 
 
 ISR(TIMER1_COMPA_vect){// interrupt game clock countdown (pin 19)  button
+  counter++;
+  Serial.print("Seconds: ");
+  Serial.println(counter);
 
+  Serial.print("Time left: ");
+  Serial.println(timeLeft);
  
+
 
   if(timeLeft == 0){
     timeLeft = 0;
@@ -375,4 +390,3 @@ sensors_event_t a, g, temp;
     stepper.step(tilt);
   }
 */
-
