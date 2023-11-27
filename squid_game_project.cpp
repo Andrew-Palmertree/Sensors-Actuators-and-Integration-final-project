@@ -195,7 +195,7 @@ void Ultrasonic() {
 
     
 
-      if(distance_cm > (prevDistance + 10) || distance_cm < (prevDistance -10 )){
+      if(distance_cm > (prevDistance + 5) || distance_cm < (prevDistance -5 )){
         Serial.println("You lost!");
         // loseMode  = 1;
       }
