@@ -57,6 +57,8 @@ int greenLight = 0;
 int gameStart = 0;
 int loseMode = 0;
 volatile int timeLeft = 60;
+long greenTime;
+long redTime;
 
 
 volatile int toggleServo = 0;
@@ -121,6 +123,7 @@ void setup() {
 
   attachInterrupt(digitalPinToInterrupt(buttonpin), INT0_ISR, RISING);
 
+  greenTime = random(1,5); //initialize random green time duration
 }
 
 
@@ -292,7 +295,7 @@ ISR(TIMER1_COMPA_vect){// interrupt game clock countdown (pin 19)  button
   if(servoState==0){ //redlight phase where ultrasonic sensor faces player
 
 
-      if(servoTime ==3){
+      if(servoTime == greenTime){
         greenLight = 1;
   
         servoState = 180;// angle after 3 sec go back to greenlight
@@ -300,20 +303,21 @@ ISR(TIMER1_COMPA_vect){// interrupt game clock countdown (pin 19)  button
 
         servoTime = 0;
 
-
+        redTime = random(1,5); //generate next random red time duration
       }
   }
   else{//greenlight phase where is turned away from sensor
 
      
 
-      if (servoTime == 2){
+      if (servoTime == redTime){
            greenLight = 0;
 
 
         servoState = 0; //angle after 2 sec go back to redlight
         servoTime = 0;
 
+        greenTime = random(1,5); //generate next random green time duration
       }
   }
 
