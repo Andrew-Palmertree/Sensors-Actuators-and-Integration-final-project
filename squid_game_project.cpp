@@ -77,8 +77,8 @@ void INT0_ISR(){ //interrupt for start of game (pin 18) button
   gameStart = 1;
   loseMode = 0;
   winMode = 0;
-  servoState = 180;
-  greenLight = 0;
+  servoState = 180;            //0-redlight, 180-greenlight
+  greenLight = 1;
   servoTime = 0;
   int ultrasonicFirstReading = 1;
 	
@@ -126,6 +126,7 @@ void setup() {
   attachInterrupt(digitalPinToInterrupt(buttonpin), INT0_ISR, RISING);
 
   greenTime = random(2,5); //initialize random green time duration
+  redTime = random(2, 5);
 }
 
 
