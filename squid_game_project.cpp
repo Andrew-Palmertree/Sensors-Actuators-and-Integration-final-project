@@ -56,6 +56,7 @@ int buttonVal;// define val of button
 int greenLight = 0;
 int gameStart = 0;
 int loseMode = 0;
+int winMode = 0;
 volatile int timeLeft = 60;
 long greenTime;
 long redTime;
@@ -75,7 +76,8 @@ void INT0_ISR(){ //interrupt for start of game (pin 18) button
   timeLeft = 60;
   gameStart = 1;
   loseMode = 0;
-  servoState = 0;
+  winMode = 0;
+  servoState = 180;
   greenLight = 0;
   servoTime = 0;
   int ultrasonicFirstReading = 1;
@@ -123,7 +125,7 @@ void setup() {
 
   attachInterrupt(digitalPinToInterrupt(buttonpin), INT0_ISR, RISING);
 
-  greenTime = random(1,5); //initialize random green time duration
+  greenTime = random(2,5); //initialize random green time duration
 }
 
 
@@ -197,7 +199,11 @@ void Ultrasonic() {
 
       if(distance_cm > (prevDistance + 5) || distance_cm < (prevDistance -5 )){
         Serial.println("You lost!");
-        // loseMode  = 1;
+         loseMode  = 1;
+      }
+      else if(distance_cm < 4){
+        Serial.println("You Win! :(");
+        winMode = 1;
       }
 
       prevDistance = distance_cm;
@@ -223,6 +229,12 @@ void LCD_screen(){// Display the time left on the LCD
     lcd.setCursor(0, 1);
     lcd.print("      Over      ");
   }
+   else if(winMode == 1){
+     lcd.setCursor(0, 0);
+    lcd.print("      YOU      ");
+    lcd.setCursor(0, 1);
+    lcd.print("      WIN      ");
+   }
 
    else if (timeLeft >= 0){
      lcd.setCursor(0, 0);
@@ -231,6 +243,7 @@ void LCD_screen(){// Display the time left on the LCD
      lcd.print(timeLeft);
      lcd.print(" Seconds      ");
    }
+  
 }
 
 
@@ -255,7 +268,7 @@ void servo2(int loseMode) {
 
   //int currentAngle = mySecondServo.read(); // myservo1.read(); 
 
-  if(loseMode == 0){
+  if(loseMode == 0 || winMode ==1){
    mySecondServo.write(0);
   }
   else{
@@ -272,12 +285,12 @@ void servo2(int loseMode) {
 
 
 ISR(TIMER1_COMPA_vect){// interrupt game clock countdown (pin 19)  button
-  counter++;
-  Serial.print("Seconds: ");
-  Serial.println(counter);
+  // counter++;
+  // Serial.print("Seconds: ");
+  // Serial.println(counter);
 
-  Serial.print("Time left: ");
-  Serial.println(timeLeft);
+  // Serial.print("Time left: ");
+  // Serial.println(timeLeft);
  
 
 
@@ -303,7 +316,7 @@ ISR(TIMER1_COMPA_vect){// interrupt game clock countdown (pin 19)  button
 
         servoTime = 0;
 
-        redTime = random(1,5); //generate next random red time duration
+        redTime = random(2,5); //generate next random red time duration
       }
   }
   else{//greenlight phase where is turned away from sensor
@@ -317,7 +330,7 @@ ISR(TIMER1_COMPA_vect){// interrupt game clock countdown (pin 19)  button
         servoState = 0; //angle after 2 sec go back to redlight
         servoTime = 0;
 
-        greenTime = random(1,5); //generate next random green time duration
+        greenTime = random(2,5); //generate next random green time duration
       }
   }
 
@@ -340,7 +353,7 @@ void loop() {
 
     LCD_screen();
 
-      if(loseMode== 0){ 
+      if(loseMode== 0 && winMode == 0){ 
 
 
        // servo2(0);
@@ -370,8 +383,6 @@ void loop() {
   }
  else{
 
-  
-  
   digitalWrite(redledpin, LOW);
   digitalWrite(greenledpin, LOW);
   noTone(buzzerPin); // Turn the buzzer off
