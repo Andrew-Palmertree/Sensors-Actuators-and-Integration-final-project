@@ -81,6 +81,9 @@ void INT0_ISR(){ //interrupt for start of game (pin 18) button
   greenLight = 1;
   servoTime = 0;
   int ultrasonicFirstReading = 1;
+  greenTime = random(2,5); //initialize random green time duration
+  redTime = random(2, 5);
+ 
 	
 
 }
@@ -125,8 +128,8 @@ void setup() {
 
   attachInterrupt(digitalPinToInterrupt(buttonpin), INT0_ISR, RISING);
 
-  greenTime = random(2,5); //initialize random green time duration
-  redTime = random(2, 5);
+  // greenTime = random(2,5); //initialize random green time duration
+  // redTime = random(2, 5);
 }
 
 
@@ -149,14 +152,10 @@ void LEDs(int LED_switch){
 
 void buzzer_noise(int noiseMode){
 
-
-
     if(noiseMode == 1){
 
       tone(buzzerPin, 2000);
     
-    
-
     }
      else{
 
@@ -188,6 +187,7 @@ void Ultrasonic() {
   //Serial.println(myFirstServo.read());
 
   if(myFirstServo.read() == 0){
+
     if (ultrasonicFirstReading == 1){
       ultrasonicFirstReading = 0;
       prevDistance = distance_cm;
@@ -196,9 +196,9 @@ void Ultrasonic() {
 
    // delay(300); 
 
-    
+      
 
-      if(distance_cm > (prevDistance + 5) || distance_cm < (prevDistance -5 )){
+      if(distance_cm > (prevDistance + 2) || distance_cm < (prevDistance -2 )){
         Serial.println("You lost!");
          loseMode  = 1;
       }
@@ -207,7 +207,7 @@ void Ultrasonic() {
         winMode = 1;
       }
 
-      prevDistance = distance_cm;
+       prevDistance = distance_cm;
 
       Serial.print("PREVIOUS Distance: ");
       Serial.println(prevDistance);
@@ -292,7 +292,6 @@ ISR(TIMER1_COMPA_vect){// interrupt game clock countdown (pin 19)  button
 
   // Serial.print("Time left: ");
   // Serial.println(timeLeft);
- 
 
 
   if(timeLeft == 0){
@@ -326,6 +325,8 @@ ISR(TIMER1_COMPA_vect){// interrupt game clock countdown (pin 19)  button
 
       if (servoTime == redTime){
            greenLight = 0;
+
+           ultrasonicFirstReading = 1;
 
 
         servoState = 0; //angle after 2 sec go back to redlight
